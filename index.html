@@ -5,57 +5,105 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PC Analyzer - know your machine</title>
   <style>
-    body { font-family: Consolas, monospace; background: #0d1117; color: #e6edf3; margin: 0; }
-    header { background: #010409; color: #58a6ff; text-align: center; padding: 20px; border-bottom: 2px solid #58a6ff; }
-    main { max-width: 800px; margin: 20px auto; padding: 0 15px; }
-    section { background: #161b22; border: 1px solid #30363d; padding: 15px; margin-bottom: 15px; }
-    h2 { color: #58a6ff; margin-top: 0; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #0b1020;
+      background-image: radial-gradient(circle at 20% 0%, #16224a 0%, transparent 50%),
+        radial-gradient(circle at 90% 20%, #0e3a4a 0%, transparent 45%);
+      color: #e6edf3; margin: 0; min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(120deg, #010409, #0d2137);
+      text-align: center; padding: 36px 15px 28px;
+      border-bottom: 3px solid #58a6ff;
+    }
+    header h1 { margin: 0; font-size: 34px; letter-spacing: 4px; color: #fff; }
+    header h1 span { color: #58a6ff; }
+    header p { color: #8b949e; margin: 8px 0 0 0; }
+    main { max-width: 860px; margin: -0px auto 0; padding: 20px 15px 10px; }
+    section {
+      background: rgba(22, 27, 34, 0.95);
+      border: 1px solid #30363d; border-radius: 12px;
+      border-left: 4px solid #58a6ff;
+      padding: 20px; margin-bottom: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+    h2 { margin: 0 0 12px 0; font-size: 19px; color: #fff; }
+    h2 .n {
+      display: inline-block; background: #58a6ff; color: #010409;
+      width: 26px; height: 26px; line-height: 26px; text-align: center;
+      border-radius: 50%; font-size: 15px; margin-right: 8px;
+    }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th { background: #000; color: #58a6ff; }
-    th, td { border: 1px solid #444; padding: 6px; text-align: left; }
-    .ok { color: #3fb950; font-weight: bold; }
-    .warn { color: #d29922; font-weight: bold; }
-    button { background: #238636; color: #fff; border: none; padding: 8px 14px; margin: 5px 5px 0 0; font-family: inherit; font-weight: bold; }
-    button:active { background: #2ea043; }
-    .out { background: #0d1117; border: 1px dashed #58a6ff; padding: 8px; margin-top: 8px; min-height: 20px; }
-    pre { background: #000; color: #a5d6a7; padding: 10px; overflow-x: auto; font-size: 12px; white-space: pre-wrap; }
-    footer { text-align: center; color: #8b949e; font-size: small; padding: 15px; }
+    th { color: #8b949e; font-weight: normal; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+    th, td { border-bottom: 1px solid #30363d; padding: 9px 6px; text-align: left; }
+    tr:last-child td { border-bottom: none; }
+    td.val { font-family: Consolas, monospace; color: #a5d6a7; word-break: break-word; }
+    .pill { display: inline-block; padding: 2px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+    .ok { background: rgba(63, 185, 80, 0.15); color: #3fb950; border: 1px solid #3fb950; }
+    .warn { background: rgba(210, 153, 34, 0.15); color: #d29922; border: 1px solid #d29922; }
+    button {
+      background: linear-gradient(180deg, #2ea043, #238636);
+      color: #fff; border: none; border-radius: 8px;
+      padding: 10px 18px; margin: 5px 8px 0 0;
+      font-family: inherit; font-weight: bold; font-size: 14px;
+    }
+    button:active { transform: scale(0.97); }
+    .out {
+      background: #0d1117; border: 1px solid #30363d; border-radius: 8px;
+      padding: 12px; margin-top: 12px; font-family: Consolas, monospace; font-size: 14px;
+    }
+    .bar { background: #30363d; border-radius: 6px; height: 10px; margin-top: 8px; overflow: hidden; }
+    .bar > div { background: linear-gradient(90deg, #1f6feb, #58a6ff); height: 100%; width: 0%; border-radius: 6px; }
+    .term { border-radius: 12px; overflow: hidden; border: 1px solid #30363d; margin-top: 4px; }
+    .term .top { background: #21262d; padding: 8px 12px; font-size: 12px; color: #8b949e; }
+    .term .top i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 5px; }
+    pre {
+      background: #000; color: #a5d6a7; padding: 14px; margin: 0;
+      overflow-x: auto; font-size: 12.5px; white-space: pre-wrap;
+      max-height: 320px; overflow-y: auto;
+    }
+    footer { text-align: center; color: #8b949e; font-size: small; padding: 20px 15px 30px; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>PC ANALYZER</h1>
-    <p>What is this machine? Benchmark it. Copy the debug report.</p>
+    <h1>PC <span>ANALYZER</span></h1>
+    <p>Specs &bull; Benchmarks &bull; Debug report - everything stays in your browser</p>
   </header>
 
   <main>
-    <!-- auto-detected specs -->
     <section>
-      <h2>1. This Machine</h2>
+      <h2><span class="n">1</span>This Machine</h2>
       <table id="specs"></table>
     </section>
 
-    <!-- speed tests -->
     <section>
-      <h2>2. Benchmark</h2>
+      <h2><span class="n">2</span>Benchmark</h2>
       <button onclick="cpuTest()">RUN CPU TEST</button>
       <button onclick="fpsTest()">RUN FPS TEST (5s)</button>
       <div class="out" id="bench">Press a button. Higher CPU score = faster. 60 FPS = smooth display.</div>
+      <div class="bar"><div id="benchBar"></div></div>
     </section>
 
-    <!-- health flags + shareable report -->
     <section>
-      <h2>3. Debug Report</h2>
-      <p>Green OK, yellow CHECK. Send this to a dev when something is slow:</p>
-      <pre id="report">building...</pre>
+      <h2><span class="n">3</span>Debug Report</h2>
+      <p style="color:#8b949e;margin-top:0">Green OK, amber CHECK. Send this to a dev when something is slow:</p>
+      <div class="term">
+        <div class="top"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i>&nbsp; debug-report.txt</div>
+        <pre id="report">building...</pre>
+      </div>
       <button onclick="copyReport(this)">COPY REPORT</button>
     </section>
-    <!-- real full report, captured by analyze.py on this PC -->
+
     <section>
-      <h2>4. Full Report Sample (real PC)</h2>
-      <p>Captured with <strong>analyze.py</strong> (needs <strong>pip install psutil</strong>, then <strong>python analyze.py</strong>). Your numbers will differ:</p>
-      <pre>=== PC FULL ANALYTICS ===
+      <h2><span class="n">4</span>Full Report Sample (real PC)</h2>
+      <p style="color:#8b949e;margin-top:0">Captured with <strong>analyze.py</strong> (<strong>pip install psutil</strong>, then <strong>python analyze.py</strong>). Your numbers will differ:</p>
+      <div class="term">
+        <div class="top"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i>&nbsp; full-report-sample.txt</div>
+        <pre>=== PC FULL ANALYTICS ===
 Computer: MY-PC
 System: Windows 11
 Processor: AMD 6-core / 12-thread @ 3.8GHz
@@ -83,6 +131,7 @@ no battery (desktop)
 
 --- TOP PROCESSES BY RAM ---
 chrome.exe, explorer.exe, antivirus, system cache</pre>
+      </div>
     </section>
   </main>
 
@@ -131,7 +180,7 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
     }
 
     // ---- health flags: simple rules a dev would check first ----
-    function flag(ok) { return ok ? '<span class="ok">OK</span>' : '<span class="warn">CHECK</span>'; }
+    function flag(ok) { return ok ? '<span class="pill ok">OK</span>' : '<span class="pill warn">CHECK</span>'; }
     function draw() {
       var rows = [
         ['OS / platform', R.os, flag(true)],
@@ -149,17 +198,20 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
       var html = '<tr><th>Item</th><th>Value</th><th>Health</th></tr>';
       var txt = 'PC ANALYZER REPORT\n';
       rows.forEach(function (r) {
-        html += '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>';
+        html += '<tr><td>' + r[0] + '</td><td class="val">' + r[1] + '</td><td>' + r[2] + '</td></tr>';
         txt += r[0] + ': ' + r[1] + '\n';
       });
       document.getElementById('specs').innerHTML = html;
       document.getElementById('report').textContent = txt;
     }
 
+    function setBar(pct) { document.getElementById('benchBar').style.width = Math.min(100, pct) + '%'; }
+
     // ---- 2a. CPU: fixed math workload, timed ----
     function cpuTest() {
       var box = document.getElementById('bench');
       box.textContent = 'running...';
+      setBar(30);
       setTimeout(function () {
         var t0 = performance.now(), x = 0;
         for (var i = 0; i < 5000000; i++) { x += Math.sqrt(i) * Math.sin(i); }
@@ -167,6 +219,7 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
         var score = Math.round(5000000 / ms * 100); // bigger = faster
         box.textContent = 'CPU: ' + ms + 'ms for 5M ops. Score ' + score +
           (score > 80000 ? ' (fast machine)' : score > 30000 ? ' (average)' : ' (slow - CHECK)');
+        setBar(Math.min(100, score / 1500));
         R.cpuScore = score + ' (' + ms + 'ms)';
         draw();
       }, 30);
@@ -176,6 +229,7 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
     function fpsTest() {
       var box = document.getElementById('bench');
       box.textContent = 'watching frames for 5s...';
+      setBar(50);
       var n = 0, t0 = performance.now();
       function frame() {
         n++;
@@ -184,6 +238,7 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
           var fps = Math.round(n / 5);
           box.textContent = 'Display: ~' + fps + ' FPS' +
             (fps >= 55 ? ' (smooth)' : ' (choppy - CHECK refresh rate / GPU)');
+          setBar(fps / 60 * 100);
           R.fps = fps;
           draw();
         }
