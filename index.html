@@ -8,6 +8,7 @@
     * { box-sizing: border-box; }
     ::selection { background: #58a6ff; color: #010409; }
     @keyframes stripes { to { background-position: 28px 0; } }
+    @keyframes pop { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     body {
       font-family: "Segoe UI", Arial, sans-serif;
       background: #0b1020;
@@ -24,13 +25,14 @@
     header h1 { margin: 0; font-size: 34px; letter-spacing: 4px; color: #fff; text-shadow: 0 0 14px rgba(88, 166, 255, 0.5); }
     header h1 span { color: #58a6ff; }
     header p { color: #8b949e; margin: 8px 0 0 0; }
-    main { max-width: 860px; margin: -0px auto 0; padding: 20px 15px 10px; }
+    main { max-width: 860px; margin: 0 auto; padding: 20px 15px 10px; }
     section {
       background: #161b22;
       border: 1px solid #30363d; border-radius: 12px;
       border-left: 4px solid #58a6ff;
       padding: 20px; margin-bottom: 18px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      animation: pop 0.3s ease;
     }
     h2 { margin: 0 0 12px 0; font-size: 19px; color: #fff; }
     h2 .n {
@@ -39,14 +41,25 @@
       border-radius: 50%; font-size: 15px; margin-right: 8px;
       box-shadow: 0 0 12px rgba(88, 166, 255, 0.7);
     }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th { color: #8b949e; font-weight: normal; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
-    th, td { border-bottom: 1px solid #30363d; padding: 9px 6px; text-align: left; }
-    tr:last-child td { border-bottom: none; }
-    td.val { font-family: Consolas, monospace; color: #a5d6a7; word-break: break-word; }
-    .pill { display: inline-block; padding: 2px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-    .ok { background: rgba(63, 185, 80, 0.15); color: #3fb950; border: 1px solid #3fb950; }
-    .warn { background: rgba(210, 153, 34, 0.15); color: #d29922; border: 1px solid #d29922; }
+    .sub { color: #8b949e; margin-top: 0; font-size: 14px; }
+    /* spec icon cards */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    .tile {
+      background: #0d1117; border: 1px solid #30363d; border-radius: 10px;
+      padding: 12px 10px; text-align: center; position: relative;
+    }
+    .tile .dot { position: absolute; top: 8px; right: 8px; width: 10px; height: 10px; border-radius: 50%; }
+    .dot.ok { background: #3fb950; box-shadow: 0 0 8px #3fb950; }
+    .dot.warn { background: #d29922; box-shadow: 0 0 8px #d29922; }
+    .tile .ico { font-size: 26px; }
+    .tile .k { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+    .tile .v { font-size: 14px; font-weight: bold; color: #fff; margin-top: 2px; word-break: break-word; }
+    /* dials */
+    .dials { display: flex; gap: 16px; margin: 12px 0 4px 0; }
+    .dial { flex: 1; background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 12px 8px 10px; text-align: center; }
+    .dial svg { width: 100%; max-width: 220px; }
+    .dial .big { font-size: 30px; font-weight: bold; color: #fff; margin-top: -6px; }
+    .dial .lbl { font-size: 12px; letter-spacing: 2px; color: #8b949e; }
     button {
       background: linear-gradient(180deg, #2ea043, #238636);
       color: #fff; border: none; border-radius: 8px;
@@ -59,31 +72,25 @@
     button:disabled { opacity: 0.45; filter: grayscale(0.6); }
     .out {
       background: #0d1117; border: 1px solid #30363d; border-radius: 8px;
-      padding: 12px; margin-top: 12px; font-family: Consolas, monospace; font-size: 14px;
+      padding: 12px; margin-top: 12px; font-size: 15px; font-weight: bold;
     }
     .bar { background: #30363d; border-radius: 6px; height: 10px; margin-top: 8px; overflow: hidden; }
     .bar > div {
-      background: linear-gradient(90deg, #1f6feb, #58a6ff);
       background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.18) 0 7px, transparent 7px 14px),
         linear-gradient(90deg, #1f6feb, #58a6ff);
-      background-size: auto, auto;
       height: 100%; width: 0%; border-radius: 6px;
       transition: width 0.4s;
       animation: stripes 0.8s linear infinite;
     }
-    .term { border-radius: 12px; overflow: hidden; border: 1px solid #30363d; margin-top: 4px; box-shadow: 0 0 24px rgba(0, 0, 0, 0.6); }
-    .term .top { background: #21262d; padding: 8px 12px; font-size: 12px; color: #8b949e; }
-    .term .top i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 5px; }
-    pre {
-      background: #000; color: #a5d6a7; padding: 14px; margin: 0;
-      overflow-x: auto; font-size: 12.5px; white-space: pre-wrap;
-      max-height: 320px; overflow-y: auto;
-    }
-    .dials { display: flex; gap: 16px; margin: 12px 0 4px 0; }
-    .dial { flex: 1; background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 12px 8px 10px; text-align: center; }
-    .dial svg { width: 100%; max-width: 220px; }
-    .dial .big { font-family: Consolas, monospace; font-size: 30px; color: #fff; margin-top: -6px; }
-    .dial .lbl { font-size: 12px; letter-spacing: 2px; color: #8b949e; }
+    /* visual checklist report */
+    .check { display: flex; align-items: center; gap: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 8px 12px; margin-top: 8px; font-size: 14px; }
+    .check .e { font-size: 18px; }
+    .check small { color: #8b949e; }
+    details { margin-top: 12px; border: 1px solid #30363d; border-radius: 8px; background: #0d1117; }
+    summary { padding: 10px 12px; cursor: pointer; color: #8b949e; font-size: 14px; }
+    .sample { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; padding: 12px; }
+    .sample div { background: #161b22; border-radius: 8px; padding: 8px; font-size: 13px; }
+    .sample b { display: block; color: #58a6ff; font-size: 12px; }
     footer { text-align: center; color: #8b949e; font-size: small; padding: 20px 15px 30px; }
   </style>
 </head>
@@ -91,13 +98,13 @@
 
   <header>
     <h1>PC <span>ANALYZER</span></h1>
-    <p>Specs &bull; Benchmarks &bull; Debug report - everything stays in your browser</p>
+    <p>Specs &bull; Benchmarks &bull; Health check - everything stays in your browser</p>
   </header>
 
   <main>
     <section>
       <h2><span class="n">1</span>This Machine</h2>
-      <table id="specs"></table>
+      <div class="grid" id="specs"></div>
     </section>
 
     <section>
@@ -133,49 +140,32 @@
     </section>
 
     <section>
-      <h2><span class="n">3</span>Debug Report</h2>
-      <p style="color:#8b949e;margin-top:0">Green OK, amber CHECK. Send this to a dev when something is slow:</p>
-      <div class="term">
-        <div class="top"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i>&nbsp; debug-report.txt</div>
-        <pre id="report">building...</pre>
-      </div>
+      <h2><span class="n">3</span>Health Check</h2>
+      <p class="sub">Tap COPY REPORT to send it to a dev when something is slow:</p>
+      <div id="reportView"></div>
+      <pre id="report" style="display:none"></pre>
       <button onclick="copyReport(this)">COPY REPORT</button>
     </section>
 
     <section>
-      <h2><span class="n">4</span>Full Report Sample (real PC)</h2>
-      <p style="color:#8b949e;margin-top:0">Captured with <strong>analyze.py</strong> (<strong>pip install psutil</strong>, then <strong>python analyze.py</strong>). Your numbers will differ:</p>
-      <div class="term">
-        <div class="top"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i>&nbsp; full-report-sample.txt</div>
-        <pre>=== PC FULL ANALYTICS ===
-Computer: MY-PC
-System: Windows 11
-Processor: AMD 6-core / 12-thread @ 3.8GHz
-Boot time: 2026-09-22 20:00
-
---- CPU ---
-Cores (physical/logical): 6 / 12
-Frequency now/max: 3801 / 3801 MHz
-Usage overall: 4.5% (idling, healthy)
-
---- MEMORY ---
-RAM total/used/free: 15.1 / 10.56 / 4.54 GB (69.9% used)
-Swap total/used: 24.0 / 0.52 GB
-
---- DISKS ---
-C:\ (NTFS): 767.68 / 930.53 GB used (82.5%)
-Disk read/written total: 26.91 / 15.47 GB
-
---- NETWORK ---
-Ethernet -&gt; 192.168.0.146
-Net sent/received total: 0.24 / 1.04 GB
-
---- BATTERY ---
-no battery (desktop)
-
---- TOP PROCESSES BY RAM ---
-chrome.exe, explorer.exe, antivirus, system cache</pre>
+      <h2><span class="n">4</span>Real PC Example</h2>
+      <p class="sub">Captured with analyze.py on a real machine. Yours will differ:</p>
+      <div class="sample">
+        <div><b>Processor</b>AMD 6-core / 12-thread @ 3.8GHz</div>
+        <div><b>Memory</b>15.1 GB, 70% used</div>
+        <div><b>Disk C:</b>82.5% full - clean up!</div>
+        <div><b>Battery</b>Desktop, no battery</div>
+        <div><b>Top RAM use</b>Browser + system cache</div>
+        <div><b>Get yours</b>pip install psutil, then python analyze.py</div>
       </div>
+      <details>
+        <summary>How do I read this?</summary>
+        <div style="padding:0 12px 12px;font-size:14px;color:#8b949e">
+          Green dot means healthy, amber means worth a look.
+          High disk use (above 85%) and high memory use slow a PC down.
+          The benchmark dials above test YOUR machine live.
+        </div>
+      </details>
     </section>
   </main>
 
@@ -194,19 +184,18 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
       } catch (e) { return 'unavailable'; }
     }
     R.os = navigator.platform || 'unknown';
-    R.browser = navigator.userAgent.split(') ').pop() || navigator.userAgent;
+    R.browser = (navigator.userAgent.split(') ').pop() || navigator.userAgent).slice(0, 60);
     R.cores = navigator.hardwareConcurrency || 'unknown';
-    R.ramGB = navigator.deviceMemory || 'unknown (Chrome-only)';
+    R.ramGB = navigator.deviceMemory || 'unknown';
     R.screen = screen.width + 'x' + screen.height + ' @' + (window.devicePixelRatio || 1) + 'x';
     R.gpu = gpu();
     R.lang = navigator.language + ' / ' + Intl.DateTimeFormat().resolvedOptions().timeZone;
     R.touch = ('ontouchstart' in window) ? 'yes' : 'no';
     R.online = navigator.onLine ? 'yes' : 'no';
     if (navigator.connection) {
-      R.net = (navigator.connection.effectiveType || '?') + ', ~' +
-        (navigator.connection.downlink || '?') + 'Mbps, ' +
-        (navigator.connection.rtt || '?') + 'ms';
-    } else { R.net = 'unknown (Chrome-only)'; }
+      R.net = (navigator.connection.effectiveType || '?') + ' ~' +
+        (navigator.connection.downlink || '?') + 'Mbps';
+    } else { R.net = 'unknown'; }
 
     // battery + disk need async APIs, fill in when ready
     if (navigator.getBattery) {
@@ -217,36 +206,55 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
     }
     if (navigator.storage && navigator.storage.estimate) {
       navigator.storage.estimate().then(function (e) {
-        R.disk = Math.round(e.usage / 1048576) + 'MB used of ' +
-          Math.round(e.quota / 1048576) + 'MB allowed';
+        R.disk = Math.round(e.usage / 1048576) + 'MB of ' +
+          Math.round(e.quota / 1048576) + 'MB';
         draw();
       });
     }
 
-    // ---- health flags: simple rules a dev would check first ----
-    function flag(ok) { return ok ? '<span class="pill ok">OK</span>' : '<span class="pill warn">CHECK</span>'; }
+    // ---- icon tiles + visual checklist, no code look ----
+    function dot(ok) { return '<span class="dot ' + (ok ? 'ok' : 'warn') + '"></span>'; }
     function draw() {
-      var rows = [
-        ['OS / platform', R.os, flag(true)],
-        ['Browser', R.browser, flag(true)],
-        ['CPU cores', R.cores, flag(Number(R.cores) >= 4)],
-        ['RAM (approx)', R.ramGB, flag(Number(R.ramGB) >= 4)],
-        ['Screen', R.screen, flag(true)],
-        ['GPU', R.gpu, flag(R.gpu !== 'unavailable' && R.gpu !== 'hidden by browser')],
-        ['Network', R.net, flag(!/2g/i.test(String(R.net)))],
-        ['Battery', R.battery || 'desktop / unknown', flag(true)],
-        ['Disk (browser quota)', R.disk || 'measuring...', flag(true)],
-        ['Touch screen', R.touch, flag(true)],
-        ['Language / zone', R.lang, flag(true)],
+      var tiles = [
+        ['💻', 'System', String(R.os).slice(0, 22), true],
+        ['🌐', 'Browser', String(R.browser).split(' ').slice(-2).join(' ').slice(0, 22), true],
+        ['⚡', 'CPU cores', R.cores, Number(R.cores) >= 4],
+        ['🧠', 'Memory', R.ramGB, Number(R.ramGB) >= 4],
+        ['🖥️', 'Screen', R.screen, true],
+        ['🎮', 'Graphics', shortGpu(), R.gpu !== 'unavailable' && R.gpu !== 'hidden by browser'],
+        ['📶', 'Network', R.net, !/2g/i.test(String(R.net))],
+        ['🔋', 'Battery', R.battery || 'desktop', true],
+        ['💾', 'Disk use', R.disk || 'measuring...', true],
       ];
-      var html = '<tr><th>Item</th><th>Value</th><th>Health</th></tr>';
-      var txt = 'PC ANALYZER REPORT\n';
-      rows.forEach(function (r) {
-        html += '<tr><td>' + r[0] + '</td><td class="val">' + r[1] + '</td><td>' + r[2] + '</td></tr>';
-        txt += r[0] + ': ' + r[1] + '\n';
+      var html = '', txt = 'PC ANALYZER REPORT\n';
+      tiles.forEach(function (t) {
+        html += '<div class="tile">' + dot(t[3]) + '<div class="ico">' + t[0] + '</div>' +
+          '<div class="k">' + t[1] + '</div><div class="v">' + t[2] + '</div></div>';
+        txt += t[1] + ': ' + t[2] + '\n';
       });
       document.getElementById('specs').innerHTML = html;
+      // visual checklist mirrors the same rows
+      var view = '';
+      tiles.forEach(function (t) {
+        view += '<div class="check"><span class="e">' + (t[3] ? '✅' : '⚠️') +
+          '</span><span>' + t[1] + ' <small>' + t[2] + '</small></span></div>';
+      });
+      document.getElementById('reportView').innerHTML = view;
       document.getElementById('report').textContent = txt;
+    }
+    function shortGpu() {
+      var g = String(R.gpu);
+      if (g === 'unavailable' || g === 'hidden by browser') return g;
+      return g.split('/').pop().split(',')[0].slice(0, 26); // first chip name only
+    }
+
+    function setBar(pct) { document.getElementById('benchBar').style.width = Math.min(100, pct) + '%'; }
+
+    // lock test buttons while a run is active so tests never overlap
+    function lockTests(on) {
+      ['btnAll', 'btnCpu', 'btnFps'].forEach(function (id) {
+        document.getElementById(id).disabled = on;
+      });
     }
 
     // ---- dials: arc fill + needle + number, like a speedtest ----
@@ -266,25 +274,6 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
         setDial(prefix, f, Math.round(target * i / steps) + (suffix || ''));
         if (i >= steps) clearInterval(tick);
       }, 25);
-    }
-    function setBar(pct) { document.getElementById('benchBar').style.width = Math.min(100, pct) + '%'; }
-
-    // lock test buttons while a run is active so tests never overlap
-    function lockTests(on) {
-      ['btnAll', 'btnCpu', 'btnFps'].forEach(function (id) {
-        document.getElementById(id).disabled = on;
-      });
-    }
-
-    // reset benchmark box, bar and dials
-    function clearBench() {
-      document.getElementById('bench').textContent =
-        'Press a button. Higher CPU score = faster. 60 FPS = smooth display.';
-      setBar(0);
-      setDial('cpu', 0, '--');
-      setDial('fps', 0, '--');
-      delete R.cpuScore;
-      delete R.fps;
     }
 
     // ---- 2a. CPU: fixed math workload, timed (retest anytime) ----
@@ -342,6 +331,17 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
     // ---- 2c. full retest: CPU first, then FPS, hands-free ----
     function runAll() {
       cpuTest(function () { fpsTest(); });
+    }
+
+    // reset benchmark box, bar and dials
+    function clearBench() {
+      document.getElementById('bench').textContent =
+        'Press a button. Higher CPU score = faster. 60 FPS = smooth display.';
+      setBar(0);
+      setDial('cpu', 0, '--');
+      setDial('fps', 0, '--');
+      delete R.cpuScore;
+      delete R.fps;
     }
 
     function copyReport(btn) {
