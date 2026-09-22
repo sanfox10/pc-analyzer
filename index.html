@@ -7,23 +7,12 @@
   <style>
     * { box-sizing: border-box; }
     ::selection { background: #58a6ff; color: #010409; }
-    @keyframes drift {
-      0% { background-position: 0% 0%, 100% 0%; }
-      50% { background-position: 100% 100%, 0% 100%; }
-      100% { background-position: 0% 0%, 100% 0%; }
-    }
-    @keyframes neon {
-      0%, 100% { text-shadow: 0 0 6px #58a6ff, 0 0 22px #1f6feb; }
-      50% { text-shadow: 0 0 12px #79c0ff, 0 0 34px #1f6feb; }
-    }
     @keyframes stripes { to { background-position: 28px 0; } }
     body {
       font-family: "Segoe UI", Arial, sans-serif;
       background: #0b1020;
       background-image: radial-gradient(circle at 20% 0%, #16224a 0%, transparent 50%),
         radial-gradient(circle at 90% 20%, #0e3a4a 0%, transparent 45%);
-      background-size: 200% 200%;
-      animation: drift 24s ease-in-out infinite;
       color: #e6edf3; margin: 0; min-height: 100vh;
     }
     header {
@@ -32,22 +21,16 @@
       border-bottom: 3px solid #58a6ff;
       box-shadow: 0 0 40px rgba(88, 166, 255, 0.15);
     }
-    header h1 { margin: 0; font-size: 34px; letter-spacing: 4px; color: #fff; animation: neon 3s ease-in-out infinite; }
+    header h1 { margin: 0; font-size: 34px; letter-spacing: 4px; color: #fff; text-shadow: 0 0 14px rgba(88, 166, 255, 0.5); }
     header h1 span { color: #58a6ff; }
     header p { color: #8b949e; margin: 8px 0 0 0; }
     main { max-width: 860px; margin: -0px auto 0; padding: 20px 15px 10px; }
     section {
-      background: rgba(22, 27, 34, 0.95);
+      background: #161b22;
       border: 1px solid #30363d; border-radius: 12px;
       border-left: 4px solid #58a6ff;
       padding: 20px; margin-bottom: 18px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-    }
-    section:hover {
-      transform: translateY(-3px);
-      border-color: #58a6ff;
-      box-shadow: 0 12px 32px rgba(88, 166, 255, 0.18);
     }
     h2 { margin: 0 0 12px 0; font-size: 19px; color: #fff; }
     h2 .n {
@@ -62,8 +45,8 @@
     tr:last-child td { border-bottom: none; }
     td.val { font-family: Consolas, monospace; color: #a5d6a7; word-break: break-word; }
     .pill { display: inline-block; padding: 2px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-    .ok { background: rgba(63, 185, 80, 0.15); color: #3fb950; border: 1px solid #3fb950; box-shadow: 0 0 10px rgba(63, 185, 80, 0.35); }
-    .warn { background: rgba(210, 153, 34, 0.15); color: #d29922; border: 1px solid #d29922; box-shadow: 0 0 10px rgba(210, 153, 34, 0.35); }
+    .ok { background: rgba(63, 185, 80, 0.15); color: #3fb950; border: 1px solid #3fb950; }
+    .warn { background: rgba(210, 153, 34, 0.15); color: #d29922; border: 1px solid #d29922; }
     button {
       background: linear-gradient(180deg, #2ea043, #238636);
       color: #fff; border: none; border-radius: 8px;
@@ -84,7 +67,6 @@
         linear-gradient(90deg, #1f6feb, #58a6ff);
       background-size: auto, auto;
       height: 100%; width: 0%; border-radius: 6px;
-      box-shadow: 0 0 12px rgba(88, 166, 255, 0.8);
       transition: width 0.4s;
       animation: stripes 0.8s linear infinite;
     }
@@ -116,6 +98,7 @@
       <h2><span class="n">2</span>Benchmark</h2>
       <button onclick="cpuTest()">RUN CPU TEST</button>
       <button onclick="fpsTest()">RUN FPS TEST (5s)</button>
+      <button onclick="clearBench()">CLEAR RESULTS</button>
       <div class="out" id="bench">Press a button. Higher CPU score = faster. 60 FPS = smooth display.</div>
       <div class="bar"><div id="benchBar"></div></div>
     </section>
@@ -238,6 +221,15 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
     }
 
     function setBar(pct) { document.getElementById('benchBar').style.width = Math.min(100, pct) + '%'; }
+
+    // reset benchmark box and bar
+    function clearBench() {
+      document.getElementById('bench').textContent =
+        'Press a button. Higher CPU score = faster. 60 FPS = smooth display.';
+      setBar(0);
+      delete R.cpuScore;
+      delete R.fps;
+    }
 
     // ---- 2a. CPU: fixed math workload, timed ----
     function cpuTest() {
