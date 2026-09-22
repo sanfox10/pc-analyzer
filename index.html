@@ -79,6 +79,11 @@
       overflow-x: auto; font-size: 12.5px; white-space: pre-wrap;
       max-height: 320px; overflow-y: auto;
     }
+    .dials { display: flex; gap: 16px; margin: 12px 0 4px 0; }
+    .dial { flex: 1; background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 12px 8px 10px; text-align: center; }
+    .dial svg { width: 100%; max-width: 220px; }
+    .dial .big { font-family: Consolas, monospace; font-size: 30px; color: #fff; margin-top: -6px; }
+    .dial .lbl { font-size: 12px; letter-spacing: 2px; color: #8b949e; }
     footer { text-align: center; color: #8b949e; font-size: small; padding: 20px 15px 30px; }
   </style>
 </head>
@@ -97,6 +102,28 @@
 
     <section>
       <h2><span class="n">2</span>Benchmark</h2>
+      <div class="dials">
+        <div class="dial">
+          <svg viewBox="0 0 180 112">
+            <path d="M15 100 A75 75 0 0 1 165 100" fill="none" stroke="#30363d" stroke-width="14" stroke-linecap="round"/>
+            <path id="cpuArc" d="M15 100 A75 75 0 0 1 165 100" fill="none" stroke="#58a6ff" stroke-width="14" stroke-linecap="round" stroke-dasharray="235.6" stroke-dashoffset="235.6"/>
+            <line id="cpuNeedle" x1="90" y1="100" x2="90" y2="40" stroke="#ffffff" stroke-width="3" stroke-linecap="round" transform="rotate(-90 90 100)"/>
+            <circle cx="90" cy="100" r="7" fill="#58a6ff"/>
+          </svg>
+          <div class="big" id="cpuNum">--</div>
+          <div class="lbl">CPU SCORE</div>
+        </div>
+        <div class="dial">
+          <svg viewBox="0 0 180 112">
+            <path d="M15 100 A75 75 0 0 1 165 100" fill="none" stroke="#30363d" stroke-width="14" stroke-linecap="round"/>
+            <path id="fpsArc" d="M15 100 A75 75 0 0 1 165 100" fill="none" stroke="#3fb950" stroke-width="14" stroke-linecap="round" stroke-dasharray="235.6" stroke-dashoffset="235.6"/>
+            <line id="fpsNeedle" x1="90" y1="100" x2="90" y2="40" stroke="#ffffff" stroke-width="3" stroke-linecap="round" transform="rotate(-90 90 100)"/>
+            <circle cx="90" cy="100" r="7" fill="#3fb950"/>
+          </svg>
+          <div class="big" id="fpsNum">--</div>
+          <div class="lbl">FPS</div>
+        </div>
+      </div>
       <button id="btnAll" onclick="runAll()">RUN ALL TESTS</button>
       <button id="btnCpu" onclick="cpuTest()">RUN CPU TEST</button>
       <button id="btnFps" onclick="fpsTest()">RUN FPS TEST (5s)</button>
@@ -222,6 +249,24 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
       document.getElementById('report').textContent = txt;
     }
 
+    // ---- dials: arc fill + needle + number, like a speedtest ----
+    var ARC = 235.6;
+    function setDial(prefix, frac, num) {
+      frac = Math.max(0, Math.min(1, frac));
+      document.getElementById(prefix + 'Arc').setAttribute('stroke-dashoffset', ARC * (1 - frac));
+      document.getElementById(prefix + 'Needle').setAttribute('transform', 'rotate(' + (-90 + 180 * frac) + ' 90 100)');
+      document.getElementById(prefix + 'Num').textContent = num;
+    }
+    // animate the number counting up to its target
+    function countUp(prefix, frac, target, suffix) {
+      var steps = 24, i = 0;
+      var tick = setInterval(function () {
+        i++;
+        var f = frac * i / steps;
+        setDial(prefix, f, Math.round(target * i / steps) + (suffix || ''));
+        if (i >= steps) clearInterval(tick);
+      }, 25);
+    }
     function setBar(pct) { document.getElementById('benchBar').style.width = Math.min(100, pct) + '%'; }
 
     // lock test buttons while a run is active so tests never overlap
@@ -231,11 +276,13 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
       });
     }
 
-    // reset benchmark box and bar
+    // reset benchmark box, bar and dials
     function clearBench() {
       document.getElementById('bench').textContent =
         'Press a button. Higher CPU score = faster. 60 FPS = smooth display.';
       setBar(0);
+      setDial('cpu', 0, '--');
+      setDial('fps', 0, '--');
       delete R.cpuScore;
       delete R.fps;
     }
@@ -254,6 +301,7 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
         box.textContent = 'CPU: ' + ms + 'ms for 5M ops. Score ' + score +
           (score > 80000 ? ' (fast machine)' : score > 30000 ? ' (average)' : ' (slow - CHECK)');
         setBar(Math.min(100, score / 1500));
+        countUp('cpu', Math.min(1, score / 1500), score, '');
         R.cpuScore = score + ' (' + ms + 'ms)';
         draw();
         lockTests(false);
@@ -267,15 +315,21 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
       lockTests(true);
       box.textContent = 'watching frames for 5s... (run again anytime)';
       setBar(50);
-      var n = 0, t0 = performance.now();
+      var n = 0, t0 = performance.now(), tick = 0;
       function frame() {
         n++;
+        // live dial while measuring (every ~10th frame)
+        if (++tick % 10 === 0) {
+          var live = Math.round(n / ((performance.now() - t0) / 1000));
+          setDial('fps', live / 75, live);
+        }
         if (performance.now() - t0 < 5000) { requestAnimationFrame(frame); }
         else {
           var fps = Math.round(n / 5);
           box.textContent = 'Display: ~' + fps + ' FPS' +
             (fps >= 55 ? ' (smooth)' : ' (choppy - CHECK refresh rate / GPU)');
           setBar(fps / 60 * 100);
+          countUp('fps', Math.min(1, fps / 75), fps, '');
           R.fps = fps;
           draw();
           lockTests(false);
