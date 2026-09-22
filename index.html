@@ -56,6 +56,7 @@
     }
     button:hover { filter: brightness(1.15); box-shadow: 0 0 16px rgba(46, 160, 67, 0.6); }
     button:active { transform: scale(0.97); }
+    button:disabled { opacity: 0.45; filter: grayscale(0.6); }
     .out {
       background: #0d1117; border: 1px solid #30363d; border-radius: 8px;
       padding: 12px; margin-top: 12px; font-family: Consolas, monospace; font-size: 14px;
@@ -96,8 +97,9 @@
 
     <section>
       <h2><span class="n">2</span>Benchmark</h2>
-      <button onclick="cpuTest()">RUN CPU TEST</button>
-      <button onclick="fpsTest()">RUN FPS TEST (5s)</button>
+      <button id="btnAll" onclick="runAll()">RUN ALL TESTS</button>
+      <button id="btnCpu" onclick="cpuTest()">RUN CPU TEST</button>
+      <button id="btnFps" onclick="fpsTest()">RUN FPS TEST (5s)</button>
       <button onclick="clearBench()">CLEAR RESULTS</button>
       <div class="out" id="bench">Press a button. Higher CPU score = faster. 60 FPS = smooth display.</div>
       <div class="bar"><div id="benchBar"></div></div>
@@ -222,6 +224,13 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
 
     function setBar(pct) { document.getElementById('benchBar').style.width = Math.min(100, pct) + '%'; }
 
+    // lock test buttons while a run is active so tests never overlap
+    function lockTests(on) {
+      ['btnAll', 'btnCpu', 'btnFps'].forEach(function (id) {
+        document.getElementById(id).disabled = on;
+      });
+    }
+
     // reset benchmark box and bar
     function clearBench() {
       document.getElementById('bench').textContent =
@@ -231,10 +240,11 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
       delete R.fps;
     }
 
-    // ---- 2a. CPU: fixed math workload, timed ----
-    function cpuTest() {
+    // ---- 2a. CPU: fixed math workload, timed (retest anytime) ----
+    function cpuTest(done) {
       var box = document.getElementById('bench');
-      box.textContent = 'running...';
+      lockTests(true);
+      box.textContent = 'running CPU test...';
       setBar(30);
       setTimeout(function () {
         var t0 = performance.now(), x = 0;
@@ -246,13 +256,16 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
         setBar(Math.min(100, score / 1500));
         R.cpuScore = score + ' (' + ms + 'ms)';
         draw();
+        lockTests(false);
+        if (done) done();
       }, 30);
     }
 
-    // ---- 2b. FPS: count frames for 5 seconds ----
-    function fpsTest() {
+    // ---- 2b. FPS: count frames for 5 seconds (retest anytime) ----
+    function fpsTest(done) {
       var box = document.getElementById('bench');
-      box.textContent = 'watching frames for 5s...';
+      lockTests(true);
+      box.textContent = 'watching frames for 5s... (run again anytime)';
       setBar(50);
       var n = 0, t0 = performance.now();
       function frame() {
@@ -265,9 +278,16 @@ chrome.exe, explorer.exe, antivirus, system cache</pre>
           setBar(fps / 60 * 100);
           R.fps = fps;
           draw();
+          lockTests(false);
+          if (done) done();
         }
       }
       requestAnimationFrame(frame);
+    }
+
+    // ---- 2c. full retest: CPU first, then FPS, hands-free ----
+    function runAll() {
+      cpuTest(function () { fpsTest(); });
     }
 
     function copyReport(btn) {
